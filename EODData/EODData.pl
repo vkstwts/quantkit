@@ -49,7 +49,7 @@ sub usage(){
      -v        : local MySQL database user name - required
      -q        : local MySQL database password - required
 
-    example: $0 -u myEODUserName%40thismail.com -p myEODPassWord -d myLocalMySQLDataBase -v myLocalMySQLDBUserName -p myLocalMySQLDBPassWord 
+    example: $0 -u myEODDataUserName -p myEODDataPassWord -d myLocalMySQLDataBase -v myLocalMySQLDBUserName -p myLocalMySQLDBPassWord 
 EOF
 	exit;
 }
@@ -57,32 +57,18 @@ EOF
 sub getEODData(){
 	($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
 	my $date = sprintf '%02d%02d%02d', $Year +1900, $Month +1 , $Day;
-	#chdir("~/SoothSayer/EODData/Data");
 	system("wget -r -v -nc --ftp-user=$userName --ftp-password=$passWord ftp://ftp.eoddata.com/");
 	mkdir("ftp.eoddata.com/Archive");
 	mkdir("ftp.eoddata.com/Archive/$date");
-	mkdir("ftp.eoddata.com/Archive/$date/Fundamentals");
-	mkdir("ftp.eoddata.com/Archive/$date/Nam es");
-	mkdir("ftp.eoddata.com/Archive/$date/Splits");
-	mkdir("ftp.eoddata.com/Archive/$date/Technical");
-		
-	#future- add fundamentals to fundamentals table
-	move("ftp.eoddata.com/Fundamentals/*","ftp.eoddata.com/Archive/$date/Fundamentals");
-	rmtree("./ftp.eoddata.com/Fundamentals");
-	#future- add Names to names table
-	move("ftp.eoddata.com/Names/*","ftp.eoddata.com/Archive/$date/Names");
-	rmtree("ftp.eoddata.com/Names");
-	
-	#future- add splits to splits table and process splits on market data
-	move("ftp.eoddata.com/Splits/*","ftp.eoddata.com/Archive/$date/Splits");
-	rmtree("ftp.eoddata.com/Splits");
-	
-	#future- add Technical to technical table
-	move("ftp.eoddata.com/Technical/*","ftp.eoddata.com/Archive/$date/Technical");
-	rmtree("ftp.eoddata.com/Technical");
-	
+
+	move("ftp.eoddata.com/Fundamentals","ftp.eoddata.com/Archive/$date/Fundamentals");
+	move("ftp.eoddata.com/Names","ftp.eoddata.com/Archive/$date/Names");
+	move("ftp.eoddata.com/Splits","ftp.eoddata.com/Archive/$date/Splits");
+	move("ftp.eoddata.com/Technical","ftp.eoddata.com/Archive/$date/Technical");
+
 	unlink("ftp.eoddata.com/terms.txt");
 	unlink("ftp.eoddata.com/readme.txt");
+
 	rmtree("ftp.eoddata.com/Software");
 }
 
