@@ -58,7 +58,7 @@ sub getEODData(){
 	($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
 	my $date = sprintf '%02d%02d%02d', $Year +1900, $Month +1 , $Day;
 	#chdir("~/SoothSayer/EODData/Data");
-	system("wget -r -v -nc --ftp-user=n_torenvliet --ftp-password=1Mbrosi1 ftp://ftp.eoddata.com/");
+	system("wget -r -v -nc --ftp-user=$userName --ftp-password=$passWord ftp://ftp.eoddata.com/");
 	mkdir("ftp.eoddata.com/Archive");
 	mkdir("ftp.eoddata.com/Archive/$date");
 	mkdir("ftp.eoddata.com/Archive/$date/Fundamentals");
