@@ -62,7 +62,7 @@ sub getEODData(){
 	mkdir("ftp.eoddata.com/Archive");
 	mkdir("ftp.eoddata.com/Archive/$date");
 	mkdir("ftp.eoddata.com/Archive/$date/Fundamentals");
-	mkdir("ftp.eoddata.com/Archive/$date/Names");
+	mkdir("ftp.eoddata.com/Archive/$date/Nam es");
 	mkdir("ftp.eoddata.com/Archive/$date/Splits");
 	mkdir("ftp.eoddata.com/Archive/$date/Technical");
 		
