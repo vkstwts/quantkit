@@ -27,6 +27,7 @@ use File::Path;
 use DBI;
 
 sub init(){
+		#get your options here
      	use Getopt::Long;
         my $opt_string = 'hu=sp=sd=sv=sq=s:';
 		GetOptions( "u=s" => \$userName, "p=s" => \$passWord,"d=s" => \$dbName,"v=s" => \$mySQLUserName,"q=s" => \$mySQLPassWord,"h"  ) or usage();
@@ -39,11 +40,14 @@ sub init(){
 
 sub usage(){
     print STDERR << "EOF";
-
-    usage: $0 [-hu:p:] [-f file]
+    
+    $0 logs into ftp.eoddata.com and downloads daily information.
+    Market and fundamental indicator data are inserted into db tables as specified
+    and split, names and technical indicators stay in text file format.  
+    All text files are archived. 
 
      -h        : this (help) message
-     -u        : www.eoddata.com username - required - sub in "%40" for "@" sign for proper URL encoding 
+     -u        : www.eoddata.com username - required 
      -p        : www.eoddata.com password - required
      -d        : local MySQL database name - required
      -v        : local MySQL database user name - required
@@ -55,21 +59,156 @@ EOF
 }
 
 sub getEODData(){
-	($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
-	my $date = sprintf '%02d%02d%02d', $Year +1900, $Month +1 , $Day;
 	system("wget -r -v -nc --ftp-user=$userName --ftp-password=$passWord ftp://ftp.eoddata.com/");
 	mkdir("ftp.eoddata.com/Archive");
 	mkdir("ftp.eoddata.com/Archive/$date");
-
-	move("ftp.eoddata.com/Fundamentals","ftp.eoddata.com/Archive/$date/Fundamentals");
-	move("ftp.eoddata.com/Names","ftp.eoddata.com/Archive/$date/Names");
-	move("ftp.eoddata.com/Splits","ftp.eoddata.com/Archive/$date/Splits");
-	move("ftp.eoddata.com/Technical","ftp.eoddata.com/Archive/$date/Technical");
 
 	unlink("ftp.eoddata.com/terms.txt");
 	unlink("ftp.eoddata.com/readme.txt");
 
 	rmtree("ftp.eoddata.com/Software");
+}
+
+sub insertFundamentalsData(){
+	my $dbh = DBI->connect('DBI:mysql:markets:localhost',$mySQLUserName,$mySQLPassWord)
+		or die "Couldn't connect to database: " . DBI->errstr;
+	chdir("ftp.eoddata.com");
+	chdir("Fundamentals");
+		
+	unlink("terms.txt");
+	unlink("readme.txt");
+	@files = <*>;
+ 	foreach $file (@files) {
+ 		 if($file =~ /.txt/){
+ 			@marketString = split("\\.",$file);
+ 			open(FH,$file);	
+ 			my $i = 0;
+			foreach $line (<FH>) {
+				if($i!=0){
+					@dataString = split(/\t/,$line);
+		       		my $sth = $dbh->prepare("INSERT INTO fundamentals (date,market,symbol,name,sector,industry,PE,EPS,divYield,shares,DPS,PEG,PTS,PTB) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+						or die "Couldn't prepare statement: " . $dbh->errstr;
+					$sth->execute($date,@marketString[0],@dataString[0],@dataString[1],@dataString[2],@dataString[3],@dataString[4],@dataString[5],@dataString[6],@dataString[7],@dataString[8],@dataString[9],@dataString[10],@dataString[11]);
+				}
+				$i++; 
+			}
+ 			close(FH);
+ 		}	
+	}
+	$dbh->disconnect;
+
+	#move the directory into the archives and drop back into EODData	
+	chdir("..");
+	mkdir("Archive/$date");
+	mkdir("Archive/$date/Fundamentals");
+	move("Fundamentals","Archive/$date/Fundamentals");
+	chdir("..");	
+}
+
+sub insertTechnicalsData(){
+	print "here\n";
+	my $dbh = DBI->connect('DBI:mysql:markets:localhost',$mySQLUserName,$mySQLPassWord)
+		or die "Couldn't connect to database: " . DBI->errstr;
+	chdir("ftp.eoddata.com");
+	chdir("Technical");
+	unlink("terms.txt");
+	unlink("readme.txt");
+	@files = <*>;
+ 	foreach $file (@files) {
+ 		 if($file =~ /.txt/){
+ 			@marketString = split("\\.",$file);
+ 			open(FH,$file);	
+ 			my $i = 0;
+			foreach $line (<FH>) {
+				if($i!=0){
+					@dataString = split(/\t/,$line);
+		       		my $sth = $dbh->prepare("INSERT INTO technicals (date,market,symbol,previous,delta,volumeChange,weekHigh,weekLow,weekChange,avgWeekChange,avgWeekVolume,monthHigh,monthLow,monthChange,avgMonthChange,avgMonthVolume,yearHigh,yearLow,yearChange,avgYearChange,avgYearVolume,MA5,MA20,MA50,MA100,MA200,RSI14,STO9,WPR14,MTM14,ROC14,PTC) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")
+						or die "Couldn't prepare statement: " . $dbh->errstr;
+					$sth->execute($date,@marketString[0],@dataString[0],@dataString[1],@dataString[2],@dataString[3],@dataString[4],@dataString[5],@dataString[6],@dataString[7],@dataString[8],@dataString[9],@dataString[10],@dataString[11],@dataString[12],@dataString[13],@dataString[14],@dataString[15],@dataString[16],@dataString[17],@dataString[18],@dataString[19],@dataString[20],@dataString[21],@dataString[22],@dataString[23],@dataString[24],@dataString[25],@dataString[26],@dataString[27],@dataString[28],@dataString[29]);
+				}
+				$i++;	 
+			}
+ 			close(FH);
+ 		}	
+	}
+	$dbh->disconnect;
+	
+	#move the directory into the archives and drop back into EODData
+	chdir("..");
+	mkdir("Archive/$date");
+	mkdir("Archive/$date/Technical");
+	move("Technical","Archive/$date/Technical");
+	chdir("..");		
+}
+
+sub insertSplitsData(){
+	my $dbh = DBI->connect('DBI:mysql:markets:localhost',$mySQLUserName,$mySQLPassWord)
+		or die "Couldn't connect to database: " . DBI->errstr;
+	chdir("ftp.eoddata.com");
+	chdir("Splits");
+	unlink("terms.txt");
+	unlink("readme.txt");
+	@files = <*>;
+ 	foreach $file (@files) {
+ 		 if($file =~ /.txt/){
+ 			@marketString = split("\\.",$file);
+ 			open(FH,$file);	
+			my $i = 0;
+			foreach $line (<FH>) {
+				if($i!=0){
+					@dataString = split(/\t/,$line);
+		       		my $sth = $dbh->prepare("INSERT INTO splits (date,market,symbol,ratio) values (?,?,?,?)")
+						or die "Couldn't prepare statement: " . $dbh->errstr;
+					$sth->execute(@dataString[1],@marketString[0],@dataString[0],@dataString[2]);
+				} 
+				$i++;
+			}
+ 			close(FH);
+ 		}	
+	}
+	$dbh->disconnect;
+
+	#move the directory into the archives and drop back into EODData
+	chdir("..");
+	mkdir("Archive/$date");
+	mkdir("Archive/$date/Splits");
+	move("Splits","Archive/$date/Splits");
+	chdir("..");	
+}
+
+sub insertNamesData(){
+	my $dbh = DBI->connect('DBI:mysql:markets:localhost',$mySQLUserName,$mySQLPassWord)
+		or die "Couldn't connect to database: " . DBI->errstr;
+	chdir("ftp.eoddata.com");
+	chdir("Names");
+	unlink("terms.txt");
+	unlink("readme.txt");
+	@files = <*>;
+ 	foreach $file (@files) {
+ 		 if($file =~ /.txt/){
+ 			@marketString = split("\\.",$file);
+ 			open(FH,$file);	
+ 			my $i = 0;
+			foreach $line (<FH>) {
+				if($i!=0){
+					@dataString = split(/\t/,$line);
+		       		my $sth = $dbh->prepare("INSERT INTO names (market,symbol,name,date) values (?,?,?,?)")
+						or die "Couldn't prepare statement: " . $dbh->errstr;
+					$sth->execute(@marketString[0],@dataString[0],@dataString[1],$date); 
+				} 
+				$i++;
+			}
+ 			close(FH);
+ 		}	
+	}
+	$dbh->disconnect;
+
+	#move the directory into the archives and drop back into EODData
+	chdir("..");
+	mkdir("Archive/$date");
+	mkdir("Archive/$date/Names");
+	move("Names","Archive/$date/Names");
+	chdir("..");	
 }
 
 sub insertEODData(){
@@ -78,27 +217,49 @@ sub insertEODData(){
 	chdir("ftp.eoddata.com");	
 	@files = <*>;
  	foreach (@files) {
- 		print "Processing $_\n";
- 		if($_ ne "Archive" && $_ ne "History"  ){
- 			print "$_ \n";
+ 		if($_ =~ /.txt/){
  			@marketString = split(/_/,$_);
  			open(FH,$_);	
+ 			my $i = 0;
 			foreach $line (<FH>) {
-				@dataString = split(/,/,$line);
-				$query = "INSERT INTO endOfDayData (date,market,symbol,open,high,low,close,volume) values ('@dataString[1]','@marketString[0]','@dataString[0]','@dataString[2]','@dataString[3]','@dataString[4]','@dataString[5]','@dataString[6]')";
-       			my $sth = $dbh->prepare($query)
-					or die "Couldn't prepare statement: " . $dbh->errstr;
-				$sth->execute;
-				#print "$sth->errstr\n";	
-            	#	or die "Couldn't execute statement: " . $sth->errstr;		 
-   			}
+				if($i!=0){
+					@dataString = split(/,/,$line);
+		       		my $sth = $dbh->prepare("INSERT INTO endOfDayData (date,market,symbol,open,high,low,close,volume) values (?,?,?,?,?,?,?,?)")
+						or die "Couldn't prepare statement: " . $dbh->errstr;
+					$sth->execute(@dataString[1],@marketString[0],@dataString[0],@dataString[2],@dataString[3],@dataString[4],@dataString[5],@dataString[6]);
+				}
+				$i++; 
+	   		}
    			close(FH);
    			move("$_","./History/$_");
  		}
  	}
- 	$dbh->disconnect; 
+ 	$dbh->disconnect;
 }
+
+#parse parameters
 init();
+
+#Provide us a global date just in case we are working near midnight.
+($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
+local $date = sprintf '%02d%02d%02d', $Year +1900, $Month +1 , $Day;
+
+#get data from ftp.eoddata.com
 getEODData;
+
+#insert end of day market data
 insertEODData;
+
+#insert fundamental indicators data
+insertFundamentalsData;
+
+#insert technical indicators data
+insertTechnicalsData;
+
+#insert splits data
+insertSplitsData;
+
+#insert names data
+insertNamesData;
+
 
