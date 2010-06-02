@@ -115,12 +115,11 @@ sub getPrintEdition(){
 		
 		#extract each article's main body/content and put it in a file named with the date of the print edition currently being worked on. 
 		@files = <*>;
-	 		foreach (@files) {
-	 			if($_ =~ /.html/){
-	 			print "Processing $_\n";
-	 			my $string = $_;
-		    	system("../PruneArticleDiv.sh div#article_story_body $string >> $dirDate.txt ");
-	 		}
+	 		foreach $file (@files) {
+	 			if($file =~ /SB/){
+	 				print "Processing $file\n";
+		    		system("../snipDiv.sh div#article_story_body $file >> $dirDate.txt");
+	 			}
 		}
 		#hop back up the directory tree and start again. 
 		chdir("..");

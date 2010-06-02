@@ -32,7 +32,7 @@ Syntax:
 snip <element  type>#<element id> <file to parsed>
 
 Example:
-snip div#bodyContent /tmp/index.html
+snipDiv div#bodyContent /tmp/index.html
 "
 exit
 }
