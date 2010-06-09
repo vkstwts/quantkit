@@ -21,11 +21,39 @@
 #FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 #OTHER DEALINGS IN THE SOFTWARE.
 
+#installed wordnet from ubuntu packages  
+library(wordnet)
+library(Snowball)
+library(RWeka)
+library(rJava)
+library(tm)
 WSJ <- Corpus(DirSource("Corpus/"))
 WSJ <- tm_map(WSJ,stripWhitespace)
 WSJ <- tm_map(WSJ,tolower)
 WSJ <- tm_map(WSJ,removeWords,stopwords("english"))
+WSJ <- tm_map(WSJ,removeNumbers)
 WSJ <- tm_map(WSJ,stemDocument)
+myStopWords <- c("ms.", "dr.")
+WSJ <- tm_map(WSJ,removeWords,myStopWords)
+WSJ <- tm_map(WSJ,removePunctuation)
 WSJDTM <- DocumentTermMatrix(WSJ)
-findFreqTerms(WSJDTM,50)
+
+findFreqTerms(WSJDTM,5)
+dirListing <- list.files("Corpus")
+corpus <- 
+meta(WSJ,tag="Author",type="local") <- dirListing 
+
+
+dirListing <- list.files("Corpus")
+corpusListing <- dirListing
+if (length(dirListing)>0){
+	for(x in 1:length(dirListing)){
+			corpusListing[x] <- DocumentTermMatrix(WSJ[[x]]])
+		}
+	}
+	
+}
+
+
+
 
