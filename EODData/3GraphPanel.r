@@ -6,7 +6,7 @@ drv = dbDriver("MySQL")
 myHost <- "yourHost"
 myDb <- "yourDB"
 myUser <- "yourUser"
-myPass <- "yourPass"
+myPass <- "yourPassed"
 
 market <- "NYSE"
 symbol <- "BCS"
