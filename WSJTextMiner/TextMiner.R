@@ -21,7 +21,8 @@
 #FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 #OTHER DEALINGS IN THE SOFTWARE.
 
-#installed wordnet from ubuntu packages  
+#installed wordnet from ubuntu packages 
+#
 library(wordnet)
 library(Snowball)
 library(RWeka)
