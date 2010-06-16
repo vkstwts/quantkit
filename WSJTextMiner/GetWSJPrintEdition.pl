@@ -65,6 +65,9 @@ sub getPrintEdition(){
 	
 	my $myTime = time();
 	
+	mkdir("Data");
+	chdir("Data");
+	
 	for ($days = $startRetrieveDay; $days <= $endRetrieveDay; $days++){
 		print " $days   $startRetrieveDay $endRetrieveDay \n";
 		
@@ -73,16 +76,15 @@ sub getPrintEdition(){
 		my $dirDate = sprintf '%02d%02d%02d', $Year+1900,, $Month +1 , $Day;
 		mkdir($dirDate);
 		chdir($dirDate);
-
 		#Download the main print edition pages with all the articles for the day listed.
 		if($days == 0){
-			system("wget -v -nc --no-check-certificate --load-cookies ../cookies.txt --save-cookies ../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0133.html");
-			system("wget -v -nc --no-check-certificate --load-cookies ../cookies.txt --save-cookies ../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0134.html");
-			system("wget -v -nc --no-check-certificate --load-cookies ../cookies.txt --save-cookies ../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0135.html");
+			system("wget -v -nc --no-check-certificate --load-cookies ../../cookies.txt --save-cookies ../../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0133.html");
+			system("wget -v -nc --no-check-certificate --load-cookies ../../cookies.txt --save-cookies ../../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0134.html");
+			system("wget -v -nc --no-check-certificate --load-cookies ../../cookies.txt --save-cookies ../../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0135.html");
 		} else {
-			system("wget -v -nc --no-check-certificate --load-cookies ../cookies.txt --save-cookies ../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0333-$dirDate.html");
-			system("wget -v -nc --no-check-certificate --load-cookies ../cookies.txt --save-cookies ../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0334-$dirDate.html");
-			system("wget -v -nc --no-check-certificate --load-cookies ../cookies.txt --save-cookies ../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0335-$dirDate.html");
+			system("wget -v -nc --no-check-certificate --load-cookies ../../cookies.txt --save-cookies ../../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0333-$dirDate.html");
+			system("wget -v -nc --no-check-certificate --load-cookies ../../cookies.txt --save-cookies ../../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0334-$dirDate.html");
+			system("wget -v -nc --no-check-certificate --load-cookies ../../cookies.txt --save-cookies ../../cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0335-$dirDate.html");
 		}		
 		
 		#Extract all hrefs from downloaded main pages to articles.txt
@@ -111,14 +113,14 @@ sub getPrintEdition(){
 		system(qq(sed -i 's/\\/article\\//http:\\/\\/professional.wsj.com\\/article\\//g' urls.txt));
 		
 		#download articles as pointed to by urls.txt
-		system("wget -v -nc --no-check-certificate --load-cookies ../cookies.txt --save-cookies ../cookies.txt --keep-session-cookies -i urls.txt");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../cookies.txt --save-cookies ../../cookies.txt --keep-session-cookies -i urls.txt");
 		
 		#extract each article's main body/content and put it in a file named with the date of the print edition currently being worked on. 
 		@files = <*>;
 	 		foreach $file (@files) {
 	 			if($file =~ /SB/){
 	 				print "Processing $file\n";
-		    		system("../snipDiv.sh div#article_story_body $file >> $dirDate.txt");
+		    		system("../../snipDiv.sh div#article_story_body $file >> $dirDate.txt");
 	 			}
 		}
 		#hop back up the directory tree and start again. 
@@ -127,6 +129,7 @@ sub getPrintEdition(){
 }
 init();
 getPrintEdition();
+
 
 
 

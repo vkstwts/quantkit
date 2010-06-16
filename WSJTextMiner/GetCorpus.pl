@@ -66,14 +66,17 @@ sub getCorpus(){
 	
 	my $myTime = time();
     mkdir("Corpus");
+    mkdir("Data");
+    chdir("Data");
+    mkdir("Archive");
 	@files = <*>;
 	foreach $file (@files) {
  			if($file =~ /2010/){
- 				print "copying $file.txt to Corpus\n";
-	    		copy("$file/$file.txt","Corpus/$file.txt")
+ 				print "copying $file.txt to ../Corpus and moving data dir $file to Archive\n";
+	    		copy("$file/$file.txt","../Corpus/$file.txt");
+	    		move("$file","Archive/$file");
  			}
 	}
-
 }
 init();
 getCorpus();
