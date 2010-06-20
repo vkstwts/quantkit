@@ -61,7 +61,7 @@ exit;
 }
 
 sub getCorpus(){
-	do "./.config";
+	do ".config";
 	($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
 	my $date = sprintf '%02d%02d%02d', $Year+1900,, $Month +1 , $Day;
 	
