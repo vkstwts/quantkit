@@ -59,13 +59,14 @@ EOF
 }
 
 sub getEODData(){
+	do ".config";
+	chdir("$BASEDIR");
+	chdir("Data");
 	system("wget -r -v -nc --ftp-user=$userName --ftp-password=$passWord ftp://ftp.eoddata.com/");
 	mkdir("ftp.eoddata.com/Archive");
 	mkdir("ftp.eoddata.com/Archive/$date");
-
 	unlink("ftp.eoddata.com/terms.txt");
 	unlink("ftp.eoddata.com/readme.txt");
-
 	rmtree("ftp.eoddata.com/Software");
 }
 
