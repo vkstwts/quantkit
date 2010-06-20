@@ -61,21 +61,24 @@ exit;
 }
 
 sub getCorpus(){
+	do "./.config";
 	($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
 	my $date = sprintf '%02d%02d%02d', $Year+1900,, $Month +1 , $Day;
 	
 	my $myTime = time();
+	chdir($BASEDIR);
     mkdir("Corpus");
-    mkdir("Data");
-    chdir("Data");
+    chdir("Corpus");
+    mkdir("Corpus");
     mkdir("Archive");
+    chdir("../Data/Data");
 	@files = <*>;
 	foreach $file (@files) {
- 			if($file =~ /2010/){
- 				print "copying $file.txt to ../Corpus and moving data dir $file to Archive\n";
-	    		copy("$file/$file.txt","../Corpus/$file.txt");
-	    		move("$file","Archive/$file");
- 			}
+		if($file =~ /2010/){
+			print "copying $file.txt to the Corpus and moving data dir $file to Archive\n";
+	    	copy("$file/$file.txt","../../Corpus/Corpus/$file.txt");
+	    	move("$file","../Archive/$file");
+		}		
 	}
 }
 init();
