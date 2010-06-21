@@ -19,6 +19,8 @@ z <- outer(xx,yy,zFunc)
 persp(xx,yy,z,theta=30,phi=30,ticktype="detailed")
 
 
-
+3.4 Excercise 4
+pFunc <- function(y){0.75*y^2}
+integrate(pFunc,0,1)
 
 

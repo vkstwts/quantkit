@@ -22,38 +22,80 @@
 #OTHER DEALINGS IN THE SOFTWARE.
 
 #installed wordnet from ubuntu packages 
-#
+#so far Snowball tends to only work when R is run as root -- bummer dude. 
+
+#if Ubuntu installed an R update... you'll need to reinstall the required packages
+install.packages("rJava")
+install.packages("RWeka")
+install.packages("Snowball")
 library(wordnet)
+
 library(Snowball)
 library(RWeka)
 library(rJava)
 library(tm)
-WSJ <- Corpus(DirSource("Corpus/"))
-WSJ <- tm_map(WSJ,stripWhitespace)
-WSJ <- tm_map(WSJ,tolower)
-WSJ <- tm_map(WSJ,removeWords,stopwords("english"))
-WSJ <- tm_map(WSJ,removeNumbers)
-WSJ <- tm_map(WSJ,stemDocument)
-myStopWords <- c("ms.", "dr.")
-WSJ <- tm_map(WSJ,removeWords,myStopWords)
-WSJ <- tm_map(WSJ,removePunctuation)
-WSJDTM <- DocumentTermMatrix(WSJ)
 
-findFreqTerms(WSJDTM,5)
-dirListing <- list.files("Corpus")
-corpus <- 
-meta(WSJ,tag="Author",type="local") <- dirListing 
+#should probably set the working directory here to soemthing given in a config file.
+date <- substr(as.character(Sys.time()),1,19)
+save.image(paste("./Images/",date,sep=""))
+
+#Swap out the old corpus, dtm and dir listing
+WSJ_LAST_CORPUS <- WSJ_CORPUS
+WSJ_LAST_DTM <- WSJ_DTM
+dirListingLast <- dirListing
+
+#Get the incremental add to the corpus and the associated dir listing
+WSJ_CORPUS <- Corpus(DirSource("../Corpus/Corpus"))
+dirListing <- list.files("../Corpus/Corpus")
+
+#Move the incremental add raw data to the archive
+system("mv ../Corpus/Corpus/* ../Corpus/Archive")
+
+#Add the dir listing to the meta tag as author for now... why? Because you can.
+#corpus <- meta(WSJ_CORPUS,tag="Author",type="local") <- dirListing 
+
+#add a raw corpus here
 
 
-dirListing <- list.files("Corpus")
-corpusListing <- dirListing
-if (length(dirListing)>0){
-	for(x in 1:length(dirListing)){
-			corpusListing[x] <- DocumentTermMatrix(WSJ[[x]]])
-		}
-	}
-	
-}
+#process the corpus
+WSJ_CORPUS <- tm_map(WSJ_CORPUS,stripWhitespace)
+WSJ_CORPUS <- tm_map(WSJ_CORPUS,tolower)
+WSJ_CORPUS <- tm_map(WSJ_CORPUS,removeWords,stopwords("english"))
+#WSJ_CORPUS <- tm_map(WSJ_CORPUS,removeNumbers) You may want to leave numbers depending on what findAssoc() can do for you.
+WSJ_CORPUS <- tm_map(WSJ_CORPUS,stemDocument) 
+myStopWords <- c("ms.", "dr.") #Add to the list of annoying words as required
+WSJ_CORPUS <- tm_map(WSJ_CORPUS,removeWords,myStopWords)
+WSJ_CORPUS <- tm_map(WSJ_CORPUS,removePunctuation)
+WSJ_DTM <- DocumentTermMatrix(WSJ_CORPUS)
+
+#Concatenate all persistent objects
+WSJ_CORPUS <- c(WSJ_LAST_CORPUS,WSJ_CORPUS)
+WSJ_DTM <- c.(t(WSJ_LAST_DTM),t(WSJ_DTM))
+WSJ_DTM <- t(WSJ_DTM)
+dirListing <- c(dirListingLast,dirListing)
+
+#Time for some analysis
+findFreqTerms(WSJ_DTM,5)
+
+#When everything is done and you want to remove some more annoying stopwords -- remember to copy this list to the usage of removeWords above. 
+myStopWords <- c("ms.", "dr.") #Add to the list of annoying words as required
+WSJ_CORPUS <- tm_map(WSJ_CORPUS,removeWords,myStopWords)
+WSJ_DTM <- DocumentTermMatrix(WSJ_CORPUS)
+
+#Using Dictionaries
+(d <- Dictionary(c("greece", "greec", "greek","china")))
+myStudy <- inspect(DocumentTermMatrix(WSJ_CORPUS, list(dictionary = d)))
+boxplot(mystudy)
+matplot(myStudy)
+matplot(myStudy, type= "l", xlab = "Length", ylab = "Width",main = "myStudy")
+
+
+#some word study plots
+matplot(myStudy,type="l", main = "Word Study",xlab="WSJ Print Date",ylab="Word Frequency",col=c("blue","red","green","black"))
+legend(10,600,colnames(myStudy),fill=c("blue","red","green","black"))
+axis(1,at=1:95,labels=rownames(myStudy),las=1)
+
+
 
 
 
