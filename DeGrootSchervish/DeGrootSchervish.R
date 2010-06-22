@@ -19,8 +19,13 @@ z <- outer(xx,yy,zFunc)
 persp(xx,yy,z,theta=30,phi=30,ticktype="detailed")
 
 
-3.4 Excercise 4
+#3.4 Excercise 4
 pFunc <- function(y){0.75*y^2}
 integrate(pFunc,0,1)
 
-
+#3.4 Excercise 5
+xx <- seq(-2,2,len=40)
+yy <- seq(-2,2,len=40)
+zFunc <- function(x,y){ifelse(0 < y & y < 1-x^2, x^2 +y, NA)}
+z <- outer(xx,yy,zFunc)
+persp(xx,yy,z,theta=30,phi=30,ticktype="detailed")
