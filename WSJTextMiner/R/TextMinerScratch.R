@@ -37,7 +37,7 @@ loadTextMinerLibraries <- function(){
 	library(plotrix)
 	library(Snowball)
 	library(RWeka)
-	library(rJ#install.packages("quantmod")ava)
+	library(rJava)
 	library(tm)
 }
 
@@ -74,7 +74,8 @@ incrementalBuildCorpusDTM <- function(){
 	WSJ_CORPUS <- tm_map(WSJ_CORPUS,tolower)
 	WSJ_CORPUS <- tm_map(WSJ_CORPUS,removeWords,stopwords("english"))
 	#WSJ_CORPUS <- tm_map(WSJ_CORPUS,removeNumbers) You may want to leave numbers depending on what findAssoc() can do for you.
-	WSJ_CORPUS <- tm_map(WSJ_CORPUS,stemDocument) 
+	WSJ_CORPUS <- tm_map(WSJ_CORPUS,stemDocument)
+	 
 	myStopWords <- c("ms.", "dr.") #Add to the list of annoying words as required
 	WSJ_CORPUS <- tm_map(WSJ_CORPUS,removeWords,myStopWords)
 	WSJ_CORPUS <- tm_map(WSJ_CORPUS,removePunctuation)

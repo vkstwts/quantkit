@@ -51,13 +51,24 @@ saveNamedImage <- function(name){
 }
 
 incrementalBuildCorpusDTM <- function(){
-	#Swap out the old corpus, dtm and dir listing
-	WSJ_LAST_CORPUS <- WSJ_CORPUS
-	WSJ_LAST_DTM <- WSJ_DTM
-	dirListingLast <- dirListing
 	
+	#Swap out the old corpus, dtm and dir listing
+	if(exists("WSJ_RAW_CORPUS")){
+		WSJ_LAST_RAW_CORPUS <- WSJ_RAW_CORPUS
+	}
+	if(exists("WSJ_CORPUS")){
+		WSJ_LAST_CORPUS <- WSJ_CORPUS
+	}
+	if(exists("WSJ_DTM")){
+		WSJ_LAST_DTM <- WSJ_DTM
+	}
+	if(exists("dirListing")){
+		dirListingLast <- dirListing
+	}
+
 	#Get the incremental add to the corpus and the associated dir listing
 	WSJ_CORPUS <- Corpus(DirSource("../Corpus/Corpus"))
+	WSJ_RAW_CORPUS <- WSJ_CORPUS
 	dirListing <- list.files("../Corpus/Corpus")
 	
 	#Move the incremental add raw data to the archive
@@ -78,6 +89,7 @@ incrementalBuildCorpusDTM <- function(){
 	WSJ_DTM <- DocumentTermMatrix(WSJ_CORPUS)
 	
 	#Concatenate all persistent objects
+	WSJ_RAW_CORPUS <- c(WSJ_LAST_RAW_CORPUS,WSJ_RAW_CORPUS)
 	WSJ_CORPUS <- c(WSJ_LAST_CORPUS,WSJ_CORPUS)
 	WSJ_DTM <- c(t(WSJ_LAST_DTM),t(WSJ_DTM))
 	WSJ_DTM <- t(WSJ_DTM)

@@ -3,13 +3,13 @@ library(RMySQL)
 library(quantmod)
 drv = dbDriver("MySQL")
 
-myHost <- ""
-myDb   <- ""
-myUser <- ""
+myHost <- "localhost"
+myDb   <- "markets"
+myUser <- "root"
 myPass <- ""
 
-market <- "LSE"
-symbol <- "FUJ"
+market <- "OTCBB"
+symbol <- "FJTSY"
 myFrom <- "2010-03-02"
 con = dbConnect(drv, host=myHost, dbname=myDb, user=myUser, pass=myPass)
 sql = paste("select date, open, high, low, close, volume from endOfDayData where date>'",myFrom,"' and market like '",market,"' and symbol like '",symbol,"' order by date",sep="")
