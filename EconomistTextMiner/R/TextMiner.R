@@ -50,16 +50,16 @@ library(openNLP)
 	
 #Swap out the old corpus, dtm and dir listing
 print("*swapping old persistents into temporary buffers")
-if(exists("WSJ_RAW_CORPUS")){
-	WSJ_LAST_RAW_CORPUS <- WSJ_RAW_CORPUS
+if(exists("ECONOMIST_RAW_CORPUS")){
+	ECONOMIST_LAST_RAW_CORPUS <- ECONOMIST_RAW_CORPUS
 }
 
-if(exists("WSJ_CORPUS")){
-	WSJ_LAST_CORPUS <- WSJ_CORPUS
+if(exists("ECONOMIST_CORPUS")){
+	ECONOMIST_LAST_CORPUS <- ECONOMIST_CORPUS
 }
 
-if(exists("WSJ_DTM")){
-	WSJ_LAST_DTM <- WSJ_DTM
+if(exists("ECONOMIST_DTM")){
+	ECONOMIST_LAST_DTM <- ECONOMIST_DTM
 }
 
 if(exists("dirListing")){
@@ -68,50 +68,50 @@ if(exists("dirListing")){
 
 #Get the incremental add to the corpus and the associated dir listing
 print("*getting the new corpus elements")
-WSJ_CORPUS <- Corpus(DirSource("../Corpus/Corpus"))
-WSJ_RAW_CORPUS <- WSJ_CORPUS
+ECONOMIST_CORPUS <- Corpus(DirSource("../Corpus/Corpus"))
+ECONOMIST_RAW_CORPUS <- ECONOMIST_CORPUS
 dirListing <- list.files("../Corpus/Corpus")
 
 #Move the incremental add raw data to the archive
 system("mv ../Corpus/Corpus/* ../Corpus/Archive")
 
 #Add some meta tags if yo want
-#corpus <- meta(WSJ_CORPUS,tag="Author",type="local") <- dirListing 
+#corpus <- meta(ECONOMIST_CORPUS,tag="Author",type="local") <- dirListing 
 	
 #process the corpus
 print("*processing the new corpus elements - stripping whitespace")
-WSJ_CORPUS <- tm_map(WSJ_CORPUS,stripWhitespace)
+ECONOMIST_CORPUS <- tm_map(ECONOMIST_CORPUS,stripWhitespace)
 print("*processing the new corpus elements - converting to lower case")
-WSJ_CORPUS <- tm_map(WSJ_CORPUS,tolower)
+ECONOMIST_CORPUS <- tm_map(ECONOMIST_CORPUS,tolower)
 print("*processing the new corpus elements - removing stopwords")
-WSJ_CORPUS <- tm_map(WSJ_CORPUS,removeWords,stopwords("english"))
-#WSJ_CORPUS <- tm_map(WSJ_CORPUS,removeNumbers) You may want to leave numbers depending on what findAssoc() can do for you.
-myStopWords <- c("ms.", "dr.","wall","street","journal","printed","page","billion","million","nozoe") #Add to the list of annoying words as required
-#WSJ_CORPUS <- tm_map(WSJ_CORPUS,removeWords,myStopWords)
+ECONOMIST_CORPUS <- tm_map(ECONOMIST_CORPUS,removeWords,stopwords("english"))
+#ECONOMIST_CORPUS <- tm_map(ECONOMIST_CORPUS,removeNumbers) You may want to leave numbers depending on what findAssoc() can do for you.
+#myStopWords <- c("ms.", "dr.") #Add to the list of annoying words as required
+#ECONOMIST_CORPUS <- tm_map(ECONOMIST_CORPUS,removeWords,myStopWords)
 print("*processing the new corpus elements - removing punctuation")
-WSJ_CORPUS <- tm_map(WSJ_CORPUS,removePunctuation)
-#WSJ_CORPUS <- tm_map(WSJ_CORPUS,stemDocument)
+ECONOMIST_CORPUS <- tm_map(ECONOMIST_CORPUS,removePunctuation)
+#ECONOMIST_CORPUS <- tm_map(ECONOMIST_CORPUS,stemDocument)
 print("*processing the new corpus elements - ngram tokenizing")
-WSJ_DTM <- DocumentTermMatrix(WSJ_CORPUS,control=list(tokenize=NGramTokenizer))
-# Weka tokenizer -- NGRAMMAR <-TermDocumentMatrix(WSJ_CORPUS,control=list(tokenize=NGramTokenizer))
+ECONOMIST_DTM <- DocumentTermMatrix(ECONOMIST_CORPUS,control=list(tokenize=NGramTokenizer))
+# Weka tokenizer -- NGRAMMAR <-TermDocumentMatrix(ECONOMIST_CORPUS,control=list(tokenize=NGramTokenizer))
 # openNLP tokenizer 			> TermDocMatrix(col, control = list(tokenize = tokenize))
 # openNLP sentence detection 	> TermDocMatrix(col, control = list(tokenize = sentDetect))
-# Not sure if this worked NGRAMMAR <-TermDocumentMatrix(WSJ_CORPUS,control=list(tokenize=NGramTokenizer,min=1,max=6))
+# Not sure if this worked NGRAMMAR <-TermDocumentMatrix(ECONOMIST_CORPUS,control=list(tokenize=NGramTokenizer,min=1,max=6))
 # see page 35 of Ingo's thesis. 
 
 #Concatenate all persistent objects
 print("*concatenating corpus and dtm elements")
-if(exists("WSJ_LAST_RAW_CORPUS")){
-	WSJ_RAW_CORPUS <- c(WSJ_LAST_RAW_CORPUS,WSJ_RAW_CORPUS)	
+if(exists("ECONOMIST_LAST_RAW_CORPUS")){
+	ECONOMIST_RAW_CORPUS <- c(ECONOMIST_LAST_RAW_CORPUS,ECONOMIST_RAW_CORPUS)	
 }
 
-if(exists("WSJ_LAST_CORPUS")){
-	WSJ_CORPUS <- c(WSJ_LAST_CORPUS,WSJ_CORPUS)	
+if(exists("ECONOMIST_LAST_CORPUS")){
+	ECONOMIST_CORPUS <- c(ECONOMIST_LAST_CORPUS,ECONOMIST_CORPUS)	
 }
 
-if(exists("WSJ_LAST_DTM")){
-	WSJ_DTM <- c(t(WSJ_LAST_DTM),t(WSJ_DTM))
-	WSJ_DTM <- t(WSJ_DTM)
+if(exists("ECONOMIST_LAST_DTM")){
+	ECONOMIST_DTM <- c(t(ECONOMIST_LAST_DTM),t(ECONOMIST_DTM))
+	ECONOMIST_DTM <- t(ECONOMIST_DTM)
 }
 
 if(exists("dirListingLast")){
