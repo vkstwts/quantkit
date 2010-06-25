@@ -8,8 +8,8 @@ myDb   <- "markets"
 myUser <- "root"
 myPass <- ""
 
-market <- "OTCBB"
-symbol <- "FJTSY"
+market <- "NYSE"
+symbol <- "AAPL"
 myFrom <- "2010-03-02"
 con = dbConnect(drv, host=myHost, dbname=myDb, user=myUser, pass=myPass)
 sql = paste("select date, open, high, low, close, volume from endOfDayData where date>'",myFrom,"' and market like '",market,"' and symbol like '",symbol,"' order by date",sep="")
