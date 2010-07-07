@@ -79,17 +79,34 @@ sub getPrintEdition(){
 		my $dirDate = sprintf '%02d%02d%02d', $Year+1900,, $Month +1 , $Day;
 		mkdir($dirDate);
 		chdir($dirDate);
-		#Download the main print edition pages with all the articles for the day listed.
-		if($days == 0){
-			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0133.html");
-			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0134.html");
-			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0135.html");
-		} else {
-			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0333-$dirDate.html");
-			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0334-$dirDate.html");
-			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0335-$dirDate.html");
-		}		
-		
+
+#Old skule WSJ
+#		if($days == 0){
+#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0133.html");
+#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0134.html");
+#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0135.html");
+#		} else {
+#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0333-$dirDate.html");
+#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0334-$dirDate.html");
+#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0335-$dirDate.html");
+#		}		
+
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/us");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/us/opinion");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/us/newyork");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/us/marketplace");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/us/moneyandinvesting");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/us/personaljournal");
+
+
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/europe");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/europe/opinion");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/europe/moneyandinvesting");
+
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/asia");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/asia/opinion");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/asia/moneyandinvesting");
+
 		#Extract all hrefs from downloaded main pages to articles.txt
 		open (MYFILE, '>>articles.txt');
 		@files = <*>;
@@ -106,25 +123,32 @@ sub getPrintEdition(){
 	        		#print "NEW LINK at $link\n";#
 		    		print MYFILE "$link\n";
 				}
+
 			}
 			close(FH);
 		}	
 		close(MYFILE);
 
 		#grep the particular urls you are looking for into urls.txt
-		system("grep mod=today articles.txt >> urls.txt");
-		system(qq(sed -i 's/\\/article\\//http:\\/\\/professional.wsj.com\\/article\\//g' urls.txt));
-		
+	
+		system("grep article/SB articles.txt >> urls.txt");
+		system(qq(sed -i 's/http:\\/\\/online.wsj.com//g' urls.txt));
+		system(qq(sed -i 's/http:\\/\\/professional.wsj.com//g' urls.txt));
+		system(qq(sed -i 's/\\/article\\//http:\\/\\/online.wsj.com\\/article\\//g' urls.txt));
 		#download articles as pointed to by urls.txt
-		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies -i urls.txt");
+		system("wget -v -nc --no-check-certificate --restrict-file-names=windows --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies -i urls.txt");
+
 		
 		#extract each article's main body/content and put it in a file named with the date of the print edition currently being worked on. 
 		system("chmod +x ../../../Bash/snipDiv.sh");
 		@files = <*>;
 	 		foreach $file (@files) {
+	 			print "Processing $file\n";
+
 	 			if($file =~ /SB/){
-	 				print "Processing $file\n";
-		    		system("../../../Bash/snipDiv.sh div#article_story_body $file >> $dirDate.txt");
+	 				system("rm temp.html");
+	 				system("cp '$file' temp.html");	 				
+		    		system("../../../Bash/snipDiv.sh div#article_story_body temp.html >> $dirDate.txt");
 	 			}
 		}
 		#hop back up the directory tree and start again. 
@@ -134,6 +158,23 @@ sub getPrintEdition(){
 init();
 getPrintEdition();
 
-
-
+#07-07 10:16:16 ERROR 403: Forbidden.
+#
+#--2010-07-07 10:16:16--  http://online.wsj.com/article/SB40001424052748704862404575350820533772584.html?mod=ITP_pageone_0
+#Connecting to online.wsj.com|205.203.132.1|:80... connected.
+#HTTP request sent, awaiting response... 302 Found
+#Location: http://professional.wsj.com/article/SB40001424052748704862404575350820533772584.html?mod=ITP_pageone_0&mg=reno-wsj [following]
+#--2010-07-07 10:16:16--  http://professional.wsj.com/article/SB40001424052748704862404575350820533772584.html?mod=ITP_pageone_0&mg=reno-wsj
+#Connecting to professional.wsj.com|205.203.132.104|:80... connected.
+#HTTP request sent, awaiting response... 403 Forbidden
+#2010-07-07 10:16:17 ERROR 403: Forbidden.
+#
+#--2010-07-07 10:16:17--  http://online.wsj.com/article/SB10001424052748704103904575336661401293070.html?mod=ITP_TEST
+#Connecting to online.wsj.com|205.203.132.1|:80... connected.
+#HTTP request sent, awaiting response... 302 Found
+#Location: http://professional.wsj.com/article/SB10001424052748704103904575336661401293070.html?mod=ITP_TEST&mg=reno-wsj [following]
+#--2010-07-07 10:16:17--  http://professional.wsj.com/article/SB10001424052748704103904575336661401293070.html?mod=ITP_TEST&mg=reno-wsj
+#Connecting to professional.wsj.com|205.203.132.104|:80... connected.
+#
+#
 

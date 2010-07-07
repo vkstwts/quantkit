@@ -1,4 +1,5 @@
-# Copyright (c) <2010> <Nick Torenvliet>
+#
+#Copyright (c) <2010> <Nick Torenvliet>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -20,5 +21,5 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTW
-system("perl ./GetWSJPrintEdition.pl -s 0 -e 0");
+system("perl ./GetWSJPrintEdition.pl -s 0 -e 4");
 system("perl ./GetCorpus.pl");
