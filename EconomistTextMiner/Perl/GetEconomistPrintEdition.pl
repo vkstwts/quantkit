@@ -21,6 +21,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+#INSTRUCTIONS: In the data directory create directories with naming convention "YYYYMMDD" for each print edition you wish to download. 
+
 sub init()
     {
      	use Getopt::Long;
@@ -73,10 +75,14 @@ sub getPrintEdition(){
 	mkdir("Archive");
 	chdir("Data");
 	my $dirDate = sprintf '%02d%02d%02d', $Year+1900,, $Month +1 , $Day;
-	mkdir($dirDate);
-	chdir($dirDate);
-	system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://www.economist.com/printedition/");
-		
+	
+	@directoryStructure = <*>;
+	foreach (@directoryStructure){
+		my $urlExtension = "index.cfm?d=$_";
+		my $dirDate = "$_";
+		chdir("$_");
+		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://www.economist.com/printedition/$urlExtension");
+			
 		#Extract all hrefs from downloaded main pages to articles.txt
 		open (MYFILE, '>>articles.txt');
 		@files = <*>;
@@ -116,7 +122,7 @@ sub getPrintEdition(){
 		}
 		#hop back up the directory tree and start again. 
 		chdir("..");
-	
+	}
 }
 init();
 getPrintEdition();

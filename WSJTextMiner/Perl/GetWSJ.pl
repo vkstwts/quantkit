@@ -21,5 +21,5 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTW
-system("perl ./GetWSJPrintEdition.pl -s 0 -e 4");
+system("perl ./GetWSJPrintEdition.pl -s 0 -e 17");
 system("perl ./GetCorpus.pl");

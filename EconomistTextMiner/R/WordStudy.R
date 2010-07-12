@@ -5,8 +5,8 @@
 
 
 #some word study plots
-thisCorpus <- WSJ_CORPUS
-terms <- c("precision", "drilling","shale","fracking","fracing","gas")
+thisCorpus <- ECONOMIST_CORPUS
+terms <- c("debt", "crisis")
 
 dict <- Dictionary(terms)
 dictStudy <- inspect(DocumentTermMatrix(thisCorpus, list(dictionary = dict)))
