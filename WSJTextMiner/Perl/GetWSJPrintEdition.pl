@@ -73,6 +73,8 @@ sub getPrintEdition(){
 	mkdir("Archive");
 	chdir("Data");
 	for ($days = $startRetrieveDay; $days <= $endRetrieveDay; $days++){
+		
+		#get some date accounting out of the way
 		print " $days   $startRetrieveDay $endRetrieveDay \n";	
 		$backTime = $myTime - ( $days * 24 * 60 * 60 );
 		($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime($backTime);
@@ -80,17 +82,7 @@ sub getPrintEdition(){
 		mkdir($dirDate);
 		chdir($dirDate);
 
-#Old skule WSJ
-#		if($days == 0){
-#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0133.html");
-#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0134.html");
-#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0135.html");
-#		} else {
-#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0333-$dirDate.html");
-#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0334-$dirDate.html");
-#			system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/page/2_0335-$dirDate.html");
-#		}		
-
+		#new WSJ directory/page naming scheme... much nicer than the old naming system. 
 		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/us");
 		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/us/opinion");
 		system("wget -v -nc --no-check-certificate --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies http://online.wsj.com/itp/$dirDate/us/newyork");
@@ -123,21 +115,19 @@ sub getPrintEdition(){
 	        		#print "NEW LINK at $link\n";#
 		    		print MYFILE "$link\n";
 				}
-
 			}
 			close(FH);
 		}	
 		close(MYFILE);
 
-		#grep the particular urls you are looking for into urls.txt
-	
+		#grep the particular urls you are looking for into urls.txt and massage for use with wget
 		system("grep article/SB articles.txt >> urls.txt");
 		system(qq(sed -i 's/http:\\/\\/online.wsj.com//g' urls.txt));
 		system(qq(sed -i 's/http:\\/\\/professional.wsj.com//g' urls.txt));
 		system(qq(sed -i 's/\\/article\\//http:\\/\\/online.wsj.com\\/article\\//g' urls.txt));
+
 		#download articles as pointed to by urls.txt
 		system("wget -v -nc --no-check-certificate --restrict-file-names=windows --load-cookies ../../../Resources/cookies.txt --save-cookies ../../../Resources/cookies.txt --keep-session-cookies -i urls.txt");
-
 		
 		#extract each article's main body/content and put it in a file named with the date of the print edition currently being worked on. 
 		system("chmod +x ../../../Bash/snipDiv.sh");
@@ -146,6 +136,7 @@ sub getPrintEdition(){
 	 			print "Processing $file\n";
 
 	 			if($file =~ /SB/){
+	 				#new WSJ naming scheme has an ampersand in it which causes snipDiv.sh to bail... copy files to the innocuously named temp.html before processing. 
 	 				system("rm temp.html");
 	 				system("cp '$file' temp.html");	 				
 		    		system("../../../Bash/snipDiv.sh div#article_story_body temp.html >> $dirDate.txt");
