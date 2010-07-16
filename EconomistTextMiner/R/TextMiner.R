@@ -47,7 +47,7 @@ library(RWeka)
 library(rJava)
 library(tm)
 library(openNLP)
-	
+library(filehash)	
 #Swap out the old corpus, dtm and dir listing
 print("*swapping old persistents into temporary buffers")
 if(exists("ECONOMIST_RAW_CORPUS")){
@@ -68,7 +68,7 @@ if(exists("dirListing")){
 
 #Get the incremental add to the corpus and the associated dir listing
 print("*getting the new corpus elements")
-ECONOMIST_CORPUS <- Corpus(DirSource("../Corpus/Corpus"))
+ECONOMIST_CORPUS <- Corpus(DirSource("../Corpus/Corpus"),dbControl=list(useDb=TRUE,dbName= "WSJ",dbType="DB1"))
 ECONOMIST_RAW_CORPUS <- ECONOMIST_CORPUS
 dirListing <- list.files("../Corpus/Corpus")
 

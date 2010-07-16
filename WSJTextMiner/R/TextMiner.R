@@ -29,6 +29,9 @@ installTextMinerPackages <- function(){
 	install.packages("plotrix")
 	install.packages("openNLP")
 }
+updatePackages <- function(){
+	update.packages()
+}
 
 saveImageSysTime <- function(){
 	date <- substr(as.character(Sys.time()),1,19)
@@ -47,12 +50,10 @@ library(RWeka)
 library(rJava)
 library(tm)
 library(openNLP)
+library(filehash)
 	
 #Swap out the old corpus, dtm and dir listing
 print("*swapping old persistents into temporary buffers")
-if(exists("WSJ_RAW_CORPUS")){
-	WSJ_LAST_RAW_CORPUS <- WSJ_RAW_CORPUS
-}
 
 if(exists("WSJ_CORPUS")){
 	WSJ_LAST_CORPUS <- WSJ_CORPUS
@@ -68,8 +69,9 @@ if(exists("dirListing")){
 
 #Get the incremental add to the corpus and the associated dir listing
 print("*getting the new corpus elements")
-WSJ_CORPUS <- Corpus(DirSource("../Corpus/Corpus"))
-WSJ_RAW_CORPUS <- WSJ_CORPUS
+WSJ_CORPUS <- Corpus(DirSource("../Corpus/Corpus"),dbControl=list(useDb=TRUE,dbName= "WSJ",dbType="DB1"))
+#WSJ_CORPUS <- Corpus(DirSource("../Corpus/Corpus"))
+#WSJ_RAW_CORPUS <- WSJ_CORPUS
 dirListing <- list.files("../Corpus/Corpus")
 
 #Move the incremental add raw data to the archive
@@ -101,9 +103,6 @@ WSJ_DTM <- DocumentTermMatrix(WSJ_CORPUS,control=list(tokenize=NGramTokenizer))
 
 #Concatenate all persistent objects
 print("*concatenating corpus and dtm elements")
-if(exists("WSJ_LAST_RAW_CORPUS")){
-	WSJ_RAW_CORPUS <- c(WSJ_LAST_RAW_CORPUS,WSJ_RAW_CORPUS)	
-}
 
 if(exists("WSJ_LAST_CORPUS")){
 	WSJ_CORPUS <- c(WSJ_LAST_CORPUS,WSJ_CORPUS)	
