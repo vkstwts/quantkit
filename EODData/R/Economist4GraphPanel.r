@@ -77,7 +77,7 @@ legend(0.5,(max(dictStudy)-10),colnames(dictStudy),col=colours,lty=1, cex=0.8,nc
 #dictStudy <- inspect(DocumentTermMatrix(thisCorpus, list(dictionary = dict)))
 #dirListing <- list.files("../Data/Archive")
 #rownames(dictStudy) <- paste(substring(dirListing,1,4),"-",substring(dirListing,5,6),"-",substring(dirListing,7,8),sep="")
-#labels<-(as.POSIXlt(rownames(dictStusydy))+172800)
+#labels<-(as.POSIXlt(rownames(dictStudy))+172800)
 #labels<-format.POSIXct(labels,format="%Y-%m-%d")
 #dictStudy <- xts (dictStudy,order.by=as.POSIXct(labels))
 #
