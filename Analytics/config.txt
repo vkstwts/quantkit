@@ -1,9 +1,0 @@
-myHost <- "localhost"
-myDb   <- "markets"
-myUser <- "root"
-myPass <- ""
-market <- "NYSE"
-symbol <- "AAPL"
-myFrom <- "2010-03-02"
-
-
