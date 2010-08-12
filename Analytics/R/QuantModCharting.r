@@ -10,9 +10,9 @@ myHost <- "localhost"
 myDb   <- "markets"
 myUser <- "localHack"
 myPass <- "localHackPass"
-market <- "NYSE"
-symbol <- "GS"
-myFrom <- "2010-02-05"
+market <- "NASDAQ"
+symbol <- "INTC"
+myFrom <- "2000-02-05"
 thisCorpus <- ECONOMIST_CORPUS
 terms <- c("gas", "natural","oil")
 

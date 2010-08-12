@@ -1,5 +1,11 @@
+#this taken from http://www.quantmod.com/examples/chartSeries3d/chartSeries3d.alpha.R
+#fire up an R console, use the "source()" command to load this code and then try 
+#"chartSeries3d0(getUSTreasuries(2010))" to get a nifty graph. 
+
+library(quantmod)
+
 `chartSeries3d0` <-
-function(Z, theta=30, r=10, col=c("yellow","red"), smoother=1, border=NA, shade=.3, ltheta=20,  x.cex=.75, srt=0,...) {
+function(Z, Ti, theta=30, r=10, col=c("yellow","red"), smoother=1, border=NA, shade=.3, ltheta=20,  x.cex=.75, srt=0,...) {
 cnames <- colnames(Z)
 yred <- colorRampPalette(col)
 par(mar=c(3,1,1,1))
@@ -44,7 +50,7 @@ lines(trans3d(x_axis[length(x_axis)], y_axis[length(y_axis)], z_axis, pm))
 segments(xy0$x,xy0$y,xy1$x,xy1$y)
 text(xy1$x, xy1$y, labels=paste(z_axis,'%',sep=''), pos=1, offset=-.5,cex=x.cex)
 
-title("Yield Curve 2008 --- Daily")
+title(Ti)
 par(mar=c(5.1,4.1,4.1,3.1))
 return(invisible(pm))
 }
@@ -79,3 +85,26 @@ function(year="2008") {
    colnames(T) <- unlist(strsplit('1mo 3mo 6mo 1yr 2yr 3yr 5yr 7yr 10yr 20yr 30yr', ' '))
    T
 }
+
+data2010 <- getUSTreasuries(2010)
+data2009 <- getUSTreasuries(2009)
+data2008 <- getUSTreasuries(2008)
+data2007 <- getUSTreasuries(2007)
+data2006 <- getUSTreasuries(2006)
+data2005 <- getUSTreasuries(2005)
+data2004 <- getUSTreasuries(2004)
+data2003 <- getUSTreasuries(2003)
+data2002 <- getUSTreasuries(2002)
+data2001 <- getUSTreasuries(2001)
+data2000 <- getUSTreasuries(2000)
+data1999 <- getUSTreasuries(1999)
+data1998 <- getUSTreasuries(1998)
+data1997 <- getUSTreasuries(1997)
+data1996 <- getUSTreasuries(1996)
+data1995 <- getUSTreasuries(1995)
+data1994 <- getUSTreasuries(1994)
+data1993 <- getUSTreasuries(1993)
+data1992 <- getUSTreasuries(1992)
+data1991 <- getUSTreasuries(1991)
+
+
