@@ -27,12 +27,28 @@ sql = paste("select date, open, high, low, close, volume from endOfDayData where
 table <- dbGetQuery(con, statement=sql)
 CADUSD <- xts(table[,-1],order.by=as.POSIXct(table[,1]))
 
+market <- "NYMEX"
+symbol <- "NG"
+sql = paste("select date, open, high, low, close, volume from endOfDayData where market like '",market,"' and symbol like '",symbol,"' order by date",sep="")
+table <- dbGetQuery(con, statement=sql)
+NG <- xts(table[,-1],order.by=as.POSIXct(table[,1]))
 
-layout(matrix(1:6, nrow=6), height=c(4,2.5,4,2.5,4,2.5))
-chartSeries(PDS,layout=NULL)
-chartSeries(PD,layout=NULL)
-chartSeries(CADUSD,layout=NULL)
 
+layout(matrix(1:8, nrow=8), height=c(4,2.5,4,2.5,4,2.5,4,2.5))
+chartSeries(PDS['2010'],layout=NULL)
+chartSeries(PD['2010'],layout=NULL)
+chartSeries(CADUSD['2010'],layout=NULL)
+chartSeries(NG['2010'],layout=NULL)
+
+mean(PD[,4])
+mean(PDS[,4])
+mean(CADUSD[,4])
+var(PD['2010',4])
+var(PDS['2010',4])
+var(CADUSD[,4])
+#add some natural gas and oil related assets into this analysis. 
+
+#SELECT distinct names.symbol,names.market,names.name from names where (names.symbol like "NG_09" or names.symbol like "NG_10" or names.symbol like "NG_11") and names.name like "%}%" order by names.symbol
 
 #################################SCRATCH PAD####################################################
 ##correlation
