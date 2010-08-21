@@ -1,39 +1,18 @@
 library(quantmod)
+
 x <- read.csv('DJI.csv',header=TRUE)
 x <- xts(x[,-1], order.by=as.POSIXct(x[,1]))
 
 tsLo <- seq(1980+1/12,1995,1/12)
 tsHi <- seq(1980+1/12,2010+8/12,1/12)
 tsR  <- seq(2009+2/12,2010 + 8/12,1/12)
-tsPredict <- seq(2009+2/12,2025,1/12)
+tsP <- seq(2009+2/12,2026,1/12)
+tsF <- seq(1980,2025,length = 46*12)
 
 loFit <- lm(x["1980::1994",4]~tsLo)
-hiFit <- lm(x["1980::2010",4]~tsHi)hiFit <- lm(x["1980::2010",4]~tsHi)
-tsRecovery2 <- tsRecovery^2
-tsRecovery3 <- tsRecovery^3
-tsRecovery4 <- tsRecovery^4
-tsRecovery5 <- tsRecovery^5
-rFit1 <- lm(x["200902::2010",4]~tsR)
-rFit2 <- lm(x["200902::2010",4]~tsR + I(tsR^2))
-rFit3 <- lm(x["200902::2010",4]~tsRecovery+I(tsRecovery^2)+I(tsRecovery^3))
-rFit4 <- lm(x["200902::2010",4]~tsRecovery+I(tsRecovery^2)+I(tsRecovery^3)+I(tsRecovery^4))
-rFit5 <- lm(x["200902::2010",4]~tsRecovery+I(tsRecovery^2)+I(tsRecovery^3)+I(tsRecovery^4)+I(tsRecovery^5))
-ssr1 <- predict(rFit1,list(tsRecovery=tsRecovery))
-ssr2 <- predict(rFit2,list(tsRecovery=tsRecovery))
-ssr3 <- predict(rFit3,list(tsRecovery=tsRecovery))
-ssr4 <- predict(rFit4,list(tsRecovery=tsRecovery))
-ssr5 <- predict(rFit5,list(tsRecovery=tsRecovery))
-plot(ssr1)
-lines(ssr2)
-lines(ssr3)
-lines(ssr4)
-lines(ssr5)
-
-
-startMonth <- as.POSIXct(as.Date("01/01/1980", format="%d/%m/%Y"))
-endMonth <- as.POSIXct(as.Date("01/01/2026", format="%d/%m/%Y"))
-
-t6 <- seq(1980,2025,length = 46*12)
+hiFit <- lm(x["1980::2010",4]~tsHi)
+#add the base clamp indicated by response from Peter on R Help list... 
+reFit <- nls(x["200902::2010", 4] ~ A + B * log(tsR-C),start=c(A=10078.4,B=1358.67,C=2009.07))
 
 predictedLo <- timeBasedSeq('198001/202512')
 predictedLo <- as.xts(predictedLo)
@@ -43,25 +22,37 @@ predictedHi <- as.xts(predictedHi)
 predictedHi <- cbind(predictedHi,0)
 predictedRecovery <- timeBasedSeq('200902/202512')
 predictedRecovery <- as.xts(predictedRecovery)
+predictedRecovery <- cbind(predictedRecovery,0)
 
-
-predictedHi[,1] <- coef(hiFit)[1] + t6*coef(hiFit)[2]
-predictedLo[,1] <- coef(loFit)[1] + t6*coef(loFit)[2] 
+predictedHi[,1] <- coef(hiFit)[1] + tsF*coef(hiFit)[2]
+predictedLo[,1] <- coef(loFit)[1] + tsF*coef(loFit)[2] 
+predictedRecovery[,1] <- coef(reFit)[1] + coef(reFit)[2] * log(tsP - coef(reFit)[3])
 
 plot(predictedHi,main="Square Root Recovery")
 lines(predictedLo)
 lines((predictedLo+predictedHi)/2)
 lines(x[,4])
+lines(predictedRecovery)
 
-#x[965-length(x[,4])] has the data for the poly fit
+brownianSim <- function(simSeries,sdWindow,sdSeed){
+	if (sdWindow < 2) return(-1)
+	brownian <- simSeries
+	brownian2 <- simSeries
+	stdxy <- sdSeed
+	for (i in 2:length(brownian)){
+		if (i >= sdWindow){
+			stdxy <- sd(brownian[(i - sdWindow + 1):i])
+			brownian[i,1]<- brownian[[i-1,1]] + brownian2[[i,1]] - brownian2[[i-1,1]] + rnorm(1,mean=0,sd=stdxy)
+		}else{
+			brownian[i,1]<- brownian[[i-1,1]] + brownian2[[i,1]] - brownian2[[i-1,1]] + rnorm(1,mean=0,sd=stdxy)
+		}
+	}
+	return(brownian)
+}
+#running the sim with brownianSim(predictedRecovery,4,800) give some really unstable runs, but also some really clean authentic looking runs and 
+#clear convergence of the mean to the expected line.  
+myPrediction <- brownianSim(predictedRecovery,4,800) #,sd(x["200902::200905",4]))
+lines(myPrediction)
 
-#the following is based on the formula that the spreadsheet fit to the data, the initial values of the a/b/c params lead to errors on some kind of iterative search. 
-nls(x["200902::2010", 4] ~ a + b * log(tsR-c) ,start=list(a=150,b=100,c=100),trace=TRUE)
-# some help on http://stackoverflow.com/questions/2243046/curve-fitting-in-r-using-nls  search on "curve fitting in R"
+#dev2bitmap("./DJI_Extrapolation_sdwindow4_initialsd800.pdf",type="pdfwrite")
 
-
-#plot(x["1980::2010",4],main="Closing",xlim=c(startMonth,endMonth))
-#plot(x["1980::2010",4],main="Closing",xlim=c(startMonth,endMonth))
-#candleChart(x["1980::2010"], multi.col=TRUE,theme="white")
-#plot(diff(x["1980::2010",4]),main="Closing")
-#plot(diff(x["1980::2010",5]),main="Volume")
