@@ -4,7 +4,7 @@ Quantitative Methods and Financial Engineering Toolkit
 
 QuantKit a friendly and apparently self-referencing bag of hammers
 
-Tools for business media analysis, statistical market analysis, fundamental market analysis and technical market anaylysis. We're starting with getting some data sources online. So far the scripts and database schemas are available to get and store daily OHLC, technicals and fundamentals for many major world markets. If you're not interested in that you can check out the scripts and tools available for the acquisition and text mining of data from major media sources. 
+Tools for business media analysis, statistical market analysis, fundamental market analysis and technical market analysis. We're starting with getting some data sources online. So far the scripts and database schemas are available to get and store daily OHLC, technicals and fundamentals for many major world markets. If you're not interested in that you can check out the scripts and tools available for the acquisition and text mining of data from major media sources. 
  
 
 **External links**
